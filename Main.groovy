@@ -17,8 +17,9 @@ import org.openscience.cdk.interfaces.IAtomContainer
 import org.openscience.cdk.isomorphism.VentoFoggia
 import org.openscience.cdk.isomorphism.AtomMatcher
 import org.openscience.cdk.isomorphism.BondMatcher
+import org.openscience.cdk.isomorphism.Pattern
 
-def cli = new CliBuilder(usage: 'groovy src/main.groovy [options]')
+def cli = new CliBuilder(usage: 'groovy Main.groovy [options]')
 cli.m(longOpt: 'molecule', args: 1, 'Molecule SMILES')
 cli.s(longOpt: 'salt', args: 1, 'Salt SMILES')
 cli.am(longOpt: 'amine-count', args: 1, 'Amine count')
@@ -61,26 +62,35 @@ if (options.r) target = sp.parseReactionSmiles(options.r)
 
 def sdg = new StructureDiagramGenerator()
 
-def alignSubstitution(StructureDiagramGenerator sdg, SmilesParser sp, IAtomContainer target, String smiles, String name) {
-	substitution_structure = sp.parseSmiles(smiles)
-	substitution_pattern = VentoFoggia.findSubstructure(substitution_structure, AtomMatcher.forElement(), BondMatcher.forOrder())
-
-	if (substitution_pattern.match(target).length > 0) {
-		sdg.generateAlignedCoordinates(target, substitution_structure, substitution_pattern);
-		Align.flipy(target)
-		return true
-	}
-	return false
-}
-
 def substitutions = [
-	[smiles: "NCCc1ccccc1", name: "phenethylamine"],
+	[name: "cathinone", smiles: "CC(C(=O)C1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "amphetamine", smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "phenethylamine", smiles: "NCCc1ccccc1"],
 ]
 
 for (sub in substitutions) {
-	def result = alignSubstitution(sdg, sp, target, sub.smiles, sub.name)
+	sub.mol = sp.parseSmiles(sub.smiles)
+	sub.pattern = VentoFoggia.findSubstructure(sub.mol, AtomMatcher.forElement(), BondMatcher.forOrder())
+}
 
-	if (result) {
+for (sub in substitutions) {
+	if (sub.pattern.match(target).length > 0) {
+		if (sub.its) {
+			for (it in sub.its) {
+				for (ssub in substitutions) {
+					if (it == ssub.name) {
+						sdg.generateAlignedCoordinates(sub.mol, ssub.mol, ssub.pattern);
+						break
+					}
+				}
+			}
+		}
+		sdg.generateAlignedCoordinates(target, sub.mol, sub.pattern);
+		Align.flipy(target)
+
+		if (sub.amph)
+			Align.amphetamine_fix(target)
+
 		println "Class: ${sub.name}"
 		break
 	}
