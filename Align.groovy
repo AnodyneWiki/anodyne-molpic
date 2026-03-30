@@ -1,7 +1,11 @@
+import javax.vecmath.Point2d
+
 import org.openscience.cdk.interfaces.IAtom
 import org.openscience.cdk.interfaces.IBond
 import org.openscience.cdk.interfaces.IStereoElement
 import org.openscience.cdk.interfaces.IAtomContainer
+
+import org.openscience.cdk.geometry.GeometryUtil
 
 class Align {
 	static void flipx(IAtomContainer mol) {
@@ -12,6 +16,11 @@ class Align {
 		for (IAtom atom : mol.atoms()) {
 			atom.getPoint2d().x = -atom.getPoint2d().x;
 		}
+	}
+
+	static void rotate(IAtomContainer mol, int degree) {
+		Point2d center = GeometryUtil.get2DCenter(mol)
+		GeometryUtil.rotate(mol, center, Math.toRadians(degree))
 	}
 
 	static void amphetamine_fix(IAtomContainer molecule) {

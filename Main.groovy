@@ -63,9 +63,12 @@ if (options.r) target = sp.parseReactionSmiles(options.r)
 def sdg = new StructureDiagramGenerator()
 
 def substitutions = [
-	[name: "cathinone", smiles: "CC(C(=O)C1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "amphetamine", smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "phenethylamine", smiles: "NCCc1ccccc1"],
+	[name: "piperidinophenone",  smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCCC2", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "pyrrolidinophenone", smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCC2", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "cathinone",          smiles: "CC(C(=O)C1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "phentermine",        smiles: "CC(C)(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" } ],
+	[name: "amphetamine",        smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "phenethylamine",     smiles: "C1=CC=C(C=C1)CCN"],
 ]
 
 for (sub in substitutions) {
@@ -91,8 +94,10 @@ for (sub in substitutions) {
 		if (sub.amph)
 			Align.amphetamine_fix(target)
 
-		println "Class: ${sub.name}"
-		break
+		if (sub.name) {
+			println "Class: ${sub.name}"
+			break
+		}
 	}
 }
 
