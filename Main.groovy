@@ -63,33 +63,80 @@ if (options.r) target = sp.parseReactionSmiles(options.r)
 def sdg = new StructureDiagramGenerator()
 
 def substitutions = [
-	[name: "piperidinophenone",  smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCCC2", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "pyrrolidinophenone", smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCC2", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "cathinone",          smiles: "CC(C(=O)C1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "phentermine",        smiles: "CC(C)(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" } ],
-	[name: "amphetamine",        smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "phenethylamine",     smiles: "C1=CC=C(C=C1)CCN"],
+	[name: "thiobarbiturate",         smiles: "O=C1NC(=S)NC(=O)C1", rot: 60, flipx: true],
+	[name: "barbiturate",             smiles: "C1(C(=O)NC(=O)NC1=O)", rot: -60, flipx: true],
+
+	[name: "β-carboline",             smiles: "C1=CC=C2C(=C1)C3=C(N2)C=NC=C3", bany: true],
+	[name: "hexahydroazepinoindole",  smiles: "C1CNCCC2=C1C3=CC=CC=C3N2", rot: -18, bany: true, flipx: true, flipy: true],
+	[name: "α-alkyltryptamine",       smiles: "CC(CC1=CNC2=CC=CC=C21)N", its: new String[] { "tryptamine" }, bany: true, amph: true],
+	[name: "β-alkyltryptamine",       smiles: "CC(CN)C1=CNC2=CC=CC=C21", its: new String[] { "tryptamine" }, bany: true],
+	[name: "tryptamine",              smiles: "C1=CC=C2C(=C1)C(=CN2)CCN", rot: -42, bany: true],
+
+	[name: "piperidinophenone",       smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCCC2", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "pyrrolidinophenone",      smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCC2", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "cathinone",               smiles: "CC(C(=O)C1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "phentermine",             smiles: "CC(C)(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" } ],
+	[name: "amphetamine",             smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "phenethylamine",          smiles: "C1=CC=C(C=C1)CCN", flipy: true],
+
+	[name: "benzylpiperazine",        smiles: "C1CN(CCN1)CC2=CC=CC=C2", its: new String[] { "benzylamine" }],
+	[name: "benzylamine",             smiles: "C1=CC=C(C=C1)CN", flipy: true],
+
+	[name: "phenylpiperazine",        smiles: "C1CN(CCN1)C2=CC=CC=C2", its: new String[] { "aniline" }],
+	[name: "aniline",                 smiles: "C1=CC=C(C=C1)N", flipx: true, flipy: true],
 ]
 
 for (sub in substitutions) {
 	sub.mol = sp.parseSmiles(sub.smiles)
-	sub.pattern = VentoFoggia.findSubstructure(sub.mol, AtomMatcher.forElement(), BondMatcher.forOrder())
+	bm = BondMatcher.forOrder()
+	if (sub.bany)
+		bm = BondMatcher.forAny()
+
+	sub.pattern = VentoFoggia.findSubstructure(sub.mol, AtomMatcher.forElement(), bm)
 }
 
 for (sub in substitutions) {
 	if (sub.pattern.match(target).length > 0) {
 		if (sub.its) {
+			IAtomContainer lsubst = null
+			Pattern lpattern = null
 			for (it in sub.its) {
 				for (ssub in substitutions) {
-					if (it == ssub.name) {
-						sdg.generateAlignedCoordinates(sub.mol, ssub.mol, ssub.pattern);
+					if (it == ssub.name || it == ssub.fame) {
+						if (lsubst == null)
+							sdg.generateCoordinates(ssub.mol)
+						else
+							sdg.generateAlignedCoordinates(ssub.mol, lsubst, lpattern)
+						if (ssub.rot)
+							Align.rotate(ssub.mol, ssub.rot)
+
+						if (ssub.flipx)
+							Align.flipx(ssub.mol)
+						if (ssub.flipy)
+							Align.flipy(ssub.mol)
+
+						lsubst = ssub.mol
+						lpattern = ssub.pattern
 						break
 					}
 				}
 			}
+			if (lsubst == null)
+				sdg.generateCoordinates(sub.mol)
+			else
+				sdg.generateAlignedCoordinates(sub.mol, lsubst, lpattern)
+		} else {
+			sdg.generateCoordinates(sub.mol)
 		}
+		if (sub.rot)
+			Align.rotate(sub.mol, sub.rot)
+
+		if (sub.flipx)
+			Align.flipx(sub.mol)
+		if (sub.flipy)
+			Align.flipy(sub.mol)
+
 		sdg.generateAlignedCoordinates(target, sub.mol, sub.pattern);
-		Align.flipy(target)
 
 		if (sub.amph)
 			Align.amphetamine_fix(target)

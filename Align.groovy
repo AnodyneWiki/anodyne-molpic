@@ -8,8 +8,50 @@ import org.openscience.cdk.interfaces.IAtomContainer
 import org.openscience.cdk.geometry.GeometryUtil
 
 class Align {
-	static void flipx(IAtomContainer mol) {
+	static void flip(IBond bond) {
+		switch (bond.getDisplay()) {
+			case IBond.Display.WedgeBegin:
+				bond.setDisplay(IBond.Display.WedgedHashBegin)
+				break
+			case IBond.Display.WedgeEnd:
+				bond.setDisplay(IBond.Display.WedgedHashEnd)
+				break
+			case IBond.Display.WedgedHashBegin:
+				bond.setDisplay(IBond.Display.WedgeBegin)
+				break
+			case IBond.Display.WedgedHashEnd:
+				bond.setDisplay(IBond.Display.WedgeEnd)
+				break
+			case IBond.Display.Bold:
+				bond.setDisplay(IBond.Display.Hash)
+				break
+			case IBond.Display.Hash:
+				bond.setDisplay(IBond.Display.Bold)
+				break
+		}
+		switch (bond.getStereo()) {
+			case IBond.Stereo.UP:
+				bond.setStereo(IBond.Stereo.DOWN)
+				break
+			case IBond.Stereo.UP_INVERTED:
+				bond.setStereo(IBond.Stereo.DOWN_INVERTED)
+				break
+			case IBond.Stereo.DOWN:
+				bond.setStereo(IBond.Stereo.UP)
+				break
+			case IBond.Stereo.DOWN_INVERTED:
+				bond.setStereo(IBond.Stereo.UP_INVERTED)
+				break
+			case IBond.Stereo.NONE:
+			default:
+				break;
+		}
+	}
 
+	static void flipx(IAtomContainer mol) {
+		for (IAtom atom : mol.atoms()) {
+			atom.getPoint2d().y = -atom.getPoint2d().y
+		}
 	}
 
 	static void flipy(IAtomContainer mol) {
