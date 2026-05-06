@@ -1,3 +1,4 @@
+//@Grab(group='org.openscience.cdk', module='cdk-bundle', version='2.11')
 import javax.vecmath.Point2d
 
 import org.openscience.cdk.interfaces.IAtom

@@ -15,7 +15,6 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 class Highlight {
-
 	static final class molpicColorer implements IAtomColorer {
 		static Map<String, Color> pallet = [
 			N  : new Color(51, 51, 153),

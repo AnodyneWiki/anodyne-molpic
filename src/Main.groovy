@@ -1,9 +1,12 @@
-@Grab(group='org.openscience.cdk', module='cdk-bundle', version='2.11')
-@Grab(group='org.openscience.cdk', module='cdk-depict', version='2.11')
+//@Grab(group='org.openscience.cdk', module='cdk-bundle', version='2.11')
+//@Grab(group='org.openscience.cdk', module='cdk-depict', version='2.11')
 
 import java.util.ArrayList
 import java.awt.Font
+
+import groovy.lang.GroovyObject
 import groovy.cli.commons.CliBuilder
+import groovy.json.JsonOutput
 
 import org.openscience.cdk.depict.DepictionGenerator
 import org.openscience.cdk.renderer.generators.standard.StandardGenerator
@@ -12,6 +15,7 @@ import org.openscience.cdk.DefaultChemObjectBuilder
 import org.openscience.cdk.layout.StructureDiagramGenerator
 
 import org.openscience.cdk.interfaces.IAtom
+import org.openscience.cdk.interfaces.IBond
 import org.openscience.cdk.interfaces.IAtomContainer
 
 import org.openscience.cdk.isomorphism.VentoFoggia
@@ -19,6 +23,8 @@ import org.openscience.cdk.isomorphism.AtomMatcher
 import org.openscience.cdk.isomorphism.BondMatcher
 import org.openscience.cdk.isomorphism.Pattern
 
+class Main {
+static void main(String [] args) {
 def cli = new CliBuilder(usage: 'groovy Main.groovy [options]')
 cli.m(longOpt: 'molecule', args: 1, 'Molecule SMILES')
 cli.s(longOpt: 'salt', args: 1, 'Salt SMILES')
@@ -30,10 +36,22 @@ cli.d(longOpt: 'debug-file', args: 1, 'Debug file')
 cli.v(longOpt: 'verbose', 'Enable verbose mode')
 
 def options = cli.parse(args)
-if (!options) return
-if (!options.m && !options.r) return
-if (options.m && options.r) return
-if (options.s && options.r) return
+if (!options) {
+	println "failed to parse options"
+	return
+}
+if (!options.m && !options.r) {
+	println "no molecule or reaction specified"
+	return
+}
+if (options.m && options.r) {
+	println "both molecule and reaction specified"
+	return
+}
+if (options.s && options.r) {
+	println "both salt and reaction specified"
+	return
+}
 
 def amine_count = options.am ? options.am.toInteger() : 1
 def acid_count = options.ac ? options.ac.toInteger() : 1
@@ -51,10 +69,10 @@ if (options.v) {
 def builder = DefaultChemObjectBuilder.instance
 def sp = new SmilesParser(builder)
 
-target = null
-salt = null
+def target = null
+def salt = null
 
-svg = ""
+def svg = ""
 
 if (options.m) target = sp.parseSmiles(options.m)
 if (options.s) salt = sp.parseSmiles(options.s)
@@ -76,7 +94,10 @@ def substitutions = [
 	[name: "pyrrolidinophenone",      smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCC2", its: new String[] { "phenethylamine" }, amph: true],
 	[name: "cathinone",               smiles: "CC(C(=O)C1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
 	[name: "phentermine",             smiles: "CC(C)(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" } ],
+	[name: "phenylethanolamine",             smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
 	[name: "amphetamine",             smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+
+	[name: "phenylethanolamine",      smiles: "C1=CC=C(C=C1)C(CN)O", its: new String[] { "phenethylamine" }],
 	[name: "phenethylamine",          smiles: "C1=CC=C(C=C1)CCN", flipy: true],
 
 	[name: "benzylpiperazine",        smiles: "C1CN(CCN1)CC2=CC=CC=C2", its: new String[] { "benzylamine" }],
@@ -84,11 +105,17 @@ def substitutions = [
 
 	[name: "phenylpiperazine",        smiles: "C1CN(CCN1)C2=CC=CC=C2", its: new String[] { "aniline" }],
 	[name: "aniline",                 smiles: "C1=CC=C(C=C1)N", flipx: true, flipy: true],
+
+	[name: "cyclohexylamine",         smiles: "C1CCC(CC1)N", flipx: true, flipy: true],
+
+	[name: "phenol",                  smiles: "C1=CC=C(C=C1)O", rot: 60],
 ]
+
+def classes = []
 
 for (sub in substitutions) {
 	sub.mol = sp.parseSmiles(sub.smiles)
-	bm = BondMatcher.forOrder()
+	def bm = BondMatcher.forOrder()
 	if (sub.bany)
 		bm = BondMatcher.forAny()
 
@@ -107,7 +134,7 @@ for (sub in substitutions) {
 							sdg.generateCoordinates(ssub.mol)
 						else
 							sdg.generateAlignedCoordinates(ssub.mol, lsubst, lpattern)
-						if (ssub.rot)
+						if (ssub.rot != null)
 							Align.rotate(ssub.mol, ssub.rot)
 
 						if (ssub.flipx)
@@ -128,7 +155,7 @@ for (sub in substitutions) {
 		} else {
 			sdg.generateCoordinates(sub.mol)
 		}
-		if (sub.rot)
+		if (sub.rot != null)
 			Align.rotate(sub.mol, sub.rot)
 
 		if (sub.flipx)
@@ -142,11 +169,14 @@ for (sub in substitutions) {
 			Align.amphetamine_fix(target)
 
 		if (sub.name) {
-			println "Class: ${sub.name}"
+			classes.add(sub.name)
 			break
 		}
 	}
 }
+
+if (classes.size() > 0)
+	println "Classes: ${classes}"
 
 def depict = new DepictionGenerator(new Font("monospace", Font.PLAIN, 18))
 	.withAtomColors()
@@ -155,7 +185,7 @@ def depict = new DepictionGenerator(new Font("monospace", Font.PLAIN, 18))
 	.withParam(StandardGenerator.StrokeRatio.class, 1.4d)
 
 if (options.m && options.s) {
-	molecules = new ArrayList<IAtomContainer>()
+	def molecules = new ArrayList<IAtomContainer>()
 	for (int ami = 0; ami < amine_count; ami++) {
 		molecules.add(target)
 	}
@@ -169,7 +199,7 @@ if (options.m && options.s) {
 
 if (!svg) return
 
-svg = Highlight.modifySVG(svg)
+svg = Highlight.modifySVG(svg).replaceAll(/>\s+</, "><")
 
 new File(options.o ?: "molecule.svg").withWriter("UTF-8") { writer ->
 	writer.write(svg)
@@ -177,6 +207,15 @@ new File(options.o ?: "molecule.svg").withWriter("UTF-8") { writer ->
 
 println "Rendered to ${options.o ?: 'molecule.svg'}"
 
+def json_data = [
+	svg: svg,
+	classes: classes
+]
+def json = JsonOutput.prettyPrint(JsonOutput.toJson(json_data))
+
 new File(options.d ?: "molecule.json").withWriter("UTF-8") { writer ->
-	writer.write(svg)
+	writer.write(json)
+}
+
+}
 }
