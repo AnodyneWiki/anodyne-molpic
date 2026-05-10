@@ -81,34 +81,99 @@ if (options.r) target = sp.parseReactionSmiles(options.r)
 def sdg = new StructureDiagramGenerator()
 
 def substitutions = [
-	[name: "thiobarbiturate",         smiles: "O=C1NC(=S)NC(=O)C1", rot: 60, flipx: true],
-	[name: "barbiturate",             smiles: "C1(C(=O)NC(=O)NC1=O)", rot: -60, flipx: true],
+	[lame: "3,4-methylenedioxyphenethylamine", smiles: "C1OC2=C(O1)C=C(C=C2)CCN"],
+	[lame: "cathinone",                        smiles: "CC(C(=O)C1=CC=CC=C1)N"],
 
-	[name: "β-carboline",             smiles: "C1=CC=C2C(=C1)C3=C(N2)C=NC=C3", bany: true],
-	[name: "hexahydroazepinoindole",  smiles: "C1CNCCC2=C1C3=CC=CC=C3N2", rot: -18, bany: true, flipx: true, flipy: true],
-	[name: "α-alkyltryptamine",       smiles: "CC(CC1=CNC2=CC=CC=C21)N", its: new String[] { "tryptamine" }, bany: true, amph: true],
-	[name: "β-alkyltryptamine",       smiles: "CC(CN)C1=CNC2=CC=CC=C21", its: new String[] { "tryptamine" }, bany: true],
-	[name: "tryptamine",              smiles: "C1=CC=C2C(=C1)C(=CN2)CCN", rot: -42, bany: true],
+	[name: "thiobarbiturate",                  smiles: "O=C1NC(=S)NC(=O)C1", rot: 60, flipx: true],
+	[name: "barbiturate",                      smiles: "C1(C(=O)NC(=O)NC1=O)", rot: -60, flipx: true],
 
-	[name: "piperidinophenone",       smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCCC2", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "pyrrolidinophenone",      smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCC2", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "cathinone",               smiles: "CC(C(=O)C1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "phentermine",             smiles: "CC(C)(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" } ],
-	[name: "phenylethanolamine",             smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
-	[name: "amphetamine",             smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "β-carboline",                      smiles: "C1=CC=C2C(=C1)C3=C(N2)C=NC=C3", bany: true],
+	[name: "hexahydroazepinoindole",           smiles: "C1CNCCC2=C1C3=CC=CC=C3N2", rot: -18, bany: true, flipx: true, flipy: true],
+	[name: "α-alkyltryptamine",                smiles: "CC(CC1=CNC2=CC=CC=C21)N", its: new String[] { "tryptamine" }, bany: true, amph: true],
+	[name: "β-alkyltryptamine",                smiles: "CC(CN)C1=CNC2=CC=CC=C21", its: new String[] { "tryptamine" }, bany: true],
+	[name: "tryptamine",                       smiles: "C1=CC=C2C(=C1)C(=CN2)CCN", rot: -42, bany: true],
 
-	[name: "phenylethanolamine",      smiles: "C1=CC=C(C=C1)C(CN)O", its: new String[] { "phenethylamine" }],
-	[name: "phenethylamine",          smiles: "C1=CC=C(C=C1)CCN", flipy: true],
 
-	[name: "benzylpiperazine",        smiles: "C1CN(CCN1)CC2=CC=CC=C2", its: new String[] { "benzylamine" }],
-	[name: "benzylamine",             smiles: "C1=CC=C(C=C1)CN", flipy: true],
+	[name: "naphthylaminopropane",             smiles: "CC(CC1=CC2=CC=CC=C2C=C1)N", amph: true],
 
-	[name: "phenylpiperazine",        smiles: "C1CN(CCN1)C2=CC=CC=C2", its: new String[] { "aniline" }],
-	[name: "aniline",                 smiles: "C1=CC=C(C=C1)N", flipx: true, flipy: true],
+	[fame: "phen",                             smiles: "OCC(C1CCCCN1)C2=CC=CC=C2", its: new String[] { "2-benzylpiperidine" }, amph: false, nself: true],
+	[fame: "naphphen",                         smiles: "COCC(C1CCCCN1)C2=CC3=CC=CC=C3C=C2", its: new String[] { "2-benzylpiperidine" }, amph: false, nself: true],
+	[name: "phenidate",                        smiles: "OC(=O)C(C1CCCCN1)C2=CC3=CC=CC=C3C=C2", its: new String[] { "2-benzylpiperidine", "naphphen"}, amph: false, nself: true],
+	[name: "phenidate",                        smiles: "OC(=O)C(C1CCCCN1)C2=CC=CC=C2", its: new String[] { "2-benzylpiperidine", "phen"}, amph: false, nself: true],
 
-	[name: "cyclohexylamine",         smiles: "C1CCC(CC1)N", flipx: true, flipy: true],
+	[name: "2-benzylpyrrolidine",              smiles: "C1CNC(C1)CC2=CC=CC=C2", its: new String[] { "phenethylamine", "amphetamine" }, amph: false],
+	[name: "2-benzylpiperidine",               smiles: "C1CCNC(C1)CC2=CC=CC=C2", its: new String[] { "phenethylamine", "amphetamine" }, amph: false, flipy: true],
+	[name: "2-benzylpiperazine",               smiles: "N1CCNC(C1)CC2=CC=CC=C2", its: new String[] { "phenethylamine", "amphetamine" }, amph: false, flipy: true],
+	[name: "3-benzylmorpholine",               smiles: "C1COCC(N1)CC2=CC=CC=C2", its: new String[] { "phenethylamine", "amphetamine" }, amph: false, flipx: true],
 
-	[name: "phenol",                  smiles: "C1=CC=C(C=C1)O", rot: 60],
+	[fame: "methylphenethylamine",             smiles: "C1=CC=C(C=C1)CCNC", flipy: true, bany: false],
+	[fame: "methamphetamine",                  smiles: "CC(CC1=CC=CC=C1)NC"],
+	[fame: "sphenethylamine",                  smiles: "C(CC1=CC=CC=C1)N", bany: true, flipy: true],
+
+	[name: "1,2-diarylethylamine",             smiles: "C1=CC=C(C=C1)CC(C2=CC=CC=C2)NC" , its: new String[] { "phenethylamine", "methamphetamine" }, amph: false, nself: true],
+	[name: "1,2-diarylethylamine",             smiles: "C1=CC=C(C=C1)CC(C2=CC=CC=C2)N" , its: new String[] { "phenethylamine" }, amph: false],
+
+	[name: "piperidinophenone",                smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCCC2", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "pyrrolidinophenone",               smiles: "CC(C(=O)C1=CC=CC=C1)N2CCCC2", its: new String[] { "phenethylamine" }, amph: true],
+
+	[fame: "metamph",                          smiles: "CC=(CCCN)C"],
+	[fame: "oramph",                           smiles: "C=C(CCN)C"],
+
+	[name: "cathinone",                        smiles: "CC1=CC=CC=C1C(=O)C(C)NC", flipx: true, its: new String[] { "oramph", "methylphenethylamine" }, amph: true],
+	[name: "cathinone",                        smiles: "CC1=CC(=CC=C1)C(=O)C(C)NC", its: new String[] { "metamph" }, amph: true],
+
+	[name: "cathinone",                        smiles: "CC1=CC=CC=C1C(=O)C(C)N", flipx: true, its: new String[] { "oramph", "phenethylamine" }, amph: true],
+	[name: "cathinone",                        smiles: "CC1=CC(=CC=C1)C(=O)C(C)N", its: new String[] { "metamph", "sphenethylamine"}, amph: true],
+
+	[name: "amphetamine",                        smiles: "CC1=CC=CC=C1CC(C)N", flipx: true, its: new String[] { "oramph", "phenethylamine" }, amph: true],
+	[name: "amphetamine",                        smiles: "CC1=CC(=CC=C1)CC(C)N", its: new String[] { "metamph", "sphenethylamine"}, amph: true],
+
+	[name: "cathinone",                        smiles: "CC(C(=O)C1=CC=CC=C1)NC", its: new String[] { "methylphenethylamine" }, amph: true],
+	[name: "cathinone",                        smiles: "CC(C(=O)C1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+
+	[fame: "erp",                              smiles: "C-C-C-N"],
+	[fame: "tsph",                             smiles: "C(CC1=CC=CS1)N"],
+	[name: "thiopropamine",                    smiles: "CC(CC1=CC=CS1)N", its: new String[] { "erp", "tsph" }, flipx: true, amph: true],
+
+	[name: "1-aminoindane",                    smiles: "C1CC2=CC=CC=C2C1N", flipx: true],
+	[name: "1-aminoindane",                    smiles: "C1=CC2=C(CCC2N)C=C1"],
+	[name: "2-aminoindane",                    smiles: "C1C(CC2=CC=CC=C21)N", bany: true ],
+
+	//[name: "phenylethanolamine",               smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+	[name: "phentermine",                      smiles: "CC(C)(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" } ],
+
+	[name: "amphetamine",                      smiles: "CC(CC1=CC=CC=C1)N", its: new String[] { "phenethylamine" }, amph: true],
+
+	[name: "phenylethanolamine",               smiles: "C1=CC=C(C=C1)C(CN)O", its: new String[] { "phenethylamine" }],
+
+	[name: "phenylpropylamine",                smiles: "C1=CC=C(C=C1)CCCN", flipy: true],
+	[name: "phenethylamine",                   smiles: "C1=CC=C(C=C1)CCN", flipy: true],
+
+	[fame: "pipcrp",                           smiles: "C1CCC(CC1)(C)N3CCCCC3", rot: 100, bany: true],
+	[name: "arylcyclohexylpiperidine",         smiles: "C1CCC(CC1)(C2=CC=CC=C2)N3CCCCC3", its: new String[] { "pipcrp" }, nself: true, flipy: true],
+
+	[fame: "mopcrp",                           smiles: "C1CCC(CC1)(C)N3CCOCC3", rot: 100, bany: true],
+	[name: "arylcyclohexylmorpholine",         smiles: "C1CCC(CC1)(C2=CC=CC=C2)N3CCOCC3", its: new String[] { "mopcrp" }, nself: true, flipy: true],
+
+
+	[fame: "pyrcrp",                           smiles: "C1CCC(CC1)(C)N3CCCC3", rot: 100, bany: true, flipx: true],
+	[name: "arylcyclohexylpyrrolidine",        smiles: "C1CCC(CC1)(C2=CC=CC=C2)N3CCCC3", its: new String[] { "pyrcrp" }, nself: true],
+
+	[fame: "oxcrp",                            smiles: "O=C1CCCCC1(N)C", rot: 60, bany: true],
+	[name: "arylcyclohexylamine",              smiles: "NC1(CCCCC1=O)C2=CC=CC=C2", its: new String[] { "oxcrp" }, flipx: true, flipy: true, bany: true, nself: true],
+
+	[fame: "crp",                              smiles: "C1CCCCC1(N)C", rot: 60, bany: true],
+	[name: "arylcyclohexylamine",              smiles: "C1CCC(CC1)(C2=CC=CC=C2)N", its: new String[] { "crp" }, bany: true, nself: true],
+
+	[name: "1-benzylpiperazine",               smiles: "C1CN(CCN1)CC2=CC=CC=C2", its: new String[] { "benzylamine" }],
+	[name: "benzylamine",                      smiles: "C1=CC=C(C=C1)CN", flipy: true],
+
+	[name: "phenylpiperazine",                 smiles: "C1CN(CCN1)C2=CC=CC=C2", its: new String[] { "aniline" }],
+	[name: "aniline",                          smiles: "C1=CC=C(C=C1)N", flipx: true, flipy: true],
+
+	[name: "cyclohexylamine",                  smiles: "C1CCC(CC1)N", flipx: true, flipy: true],
+
+	[name: "phenol",                           smiles: "C1=CC=C(C=C1)O", rot: 60],
 ]
 
 def classes = []
@@ -123,7 +188,7 @@ for (sub in substitutions) {
 }
 
 for (sub in substitutions) {
-	if (sub.pattern.match(target).length > 0) {
+	if (sub.pattern.match(target).length > 0 && sub.fame == null) {
 		if (sub.its) {
 			IAtomContainer lsubst = null
 			Pattern lpattern = null
@@ -148,32 +213,59 @@ for (sub in substitutions) {
 					}
 				}
 			}
-			if (lsubst == null)
-				sdg.generateCoordinates(sub.mol)
-			else
-				sdg.generateAlignedCoordinates(sub.mol, lsubst, lpattern)
+			if (lsubst == null) {
+				if (sub.nself == true)
+					sdg.generateCoordinates(target)
+				else
+					sdg.generateCoordinates(sub.mol)
+			} else {
+				if (sub.nself == true)
+					sdg.generateAlignedCoordinates(target, lsubst, lpattern)
+				else
+					sdg.generateAlignedCoordinates(sub.mol, lsubst, lpattern)
+			}
 		} else {
-			sdg.generateCoordinates(sub.mol)
+			if (sub.lame == null) {
+				if (sub.nself == true)
+					sdg.generateCoordinates(target)
+				else
+					sdg.generateCoordinates(sub.mol)
+			}
 		}
-		if (sub.rot != null)
-			Align.rotate(sub.mol, sub.rot)
+		if (sub.lame == null) {
+			if (sub.nself == true) {
+				if (sub.rot != null)
+					Align.rotate(target, sub.rot)
+				if (sub.flipx == true)
+					Align.flipx(target)
+				if (sub.flipy == true)
+					Align.flipy(target)
+			} else {
+				if (sub.rot != null)
+					Align.rotate(sub.mol, sub.rot)
+				if (sub.flipx == true)
+					Align.flipx(sub.mol)
+				if (sub.flipy == true)
+					Align.flipy(sub.mol)
 
-		if (sub.flipx)
-			Align.flipx(sub.mol)
-		if (sub.flipy)
-			Align.flipy(sub.mol)
+				sdg.generateAlignedCoordinates(target, sub.mol, sub.pattern);
+			}
 
-		sdg.generateAlignedCoordinates(target, sub.mol, sub.pattern);
-
-		if (sub.amph)
-			Align.amphetamine_fix(target)
+			if (sub.amph)
+				Align.amphetamine_fix(target)
+		}
 
 		if (sub.name) {
 			classes.add(sub.name)
 			break
 		}
+		if (sub.lame) {
+			classes.add(sub.lame)
+		}
 	}
 }
+
+classes.unique()
 
 if (classes.size() > 0)
 	println "Classes: ${classes}"

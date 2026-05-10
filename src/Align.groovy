@@ -70,6 +70,7 @@ class Align {
 		println("amphetamine fix running!")
 		for (IStereoElement<?, ?> se : molecule.stereoElements()) {
 			if (se.getConfigClass() == IStereoElement.Tetrahedral) {
+				IBond orig = null
 				IBond.Display disp = IBond.Display.Solid
 				IBond.Stereo ster = IBond.Stereo.NONE
 				ArrayList<IBond> bondi = new ArrayList<IBond>()
@@ -90,7 +91,8 @@ class Align {
 					}
 					for (IBond cbond : targ.bonds()) {
 						if (cbond.getStereo() == IBond.Stereo.NONE || cbond.getDisplay() == IBond.Display.Solid) continue
-						
+
+						orig = bond //
 						ster = bond.getStereo()
 						disp = bond.getDisplay()
 						bond.setStereo(IBond.Stereo.NONE)
@@ -100,6 +102,7 @@ class Align {
 						break
 					}
 				}
+				Boolean set = false
 				for (IBond bond : bondi) {
 					if (bond.getBegin().getBondCount() != 1 && bond.getEnd().getBondCount() != 1) {
 						continue
@@ -123,6 +126,11 @@ class Align {
 					println(bond.getDisplay().toString())
 					bond.setStereo(ster)
 					bond.setDisplay(disp)
+					set = true
+				}
+				if (set == false) {
+					orig.setStereo(ster) //
+					orig.setDisplay(disp) //
 				}
 			}
 		}
