@@ -2,7 +2,19 @@
 
 ![Example](example.png)
 
-### Usage
+## Usage
+### with nix
+```shell
+nix develop .
+
+molpic -v -m "CC(C)(CC1=CC=CC=C1)N" -o phentermine.svg
+```
+or
+```shell
+nix run . -- -v -m "CC(C)(CC1=CC=CC=C1)N" -o phentermine.svg
+```
+
+### without nix
 ```shell
 gradle jar
 
